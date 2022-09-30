@@ -13,13 +13,38 @@ class Cadastro:
             try:
                 nome = str(input("Digite seu primeiro nome: ")).capitalize()
                 sobrenome = str(input("Digite seu sobrenome: ")).capitalize()
-                cpf = int(input("Digite seu cpf sem pontos: "))
+                while True:
+                    cpf = str(input("Digite seu cpf (apenas números): "))
+                    total = int(0)
+                    a = 10
+                    for i in range(0, 9):
+                        for l in cpf[i]:
+                            x = (int(l) * int(a))
+                            total += x
+                            a -= 1
+                    digito1 = (11 - (total % 11))
+                    if digito1 >= 10:
+                        digito1 = 0
+                    n = 11
+                    total2 = 0
+                    for i in range(0, 10):
+                        for l in cpf[i]:
+                            s = (int(l) * int(n))
+                            total2 += s
+                            n -= 1
+                    digito2 = 11 - (total2 % 11)
+                    if digito2 >9:
+                        digito2 = 0
+                    if int(digito1) == int(cpf[9]) and int(digito2) == int(cpf[10]):
+                        break
+                    else:
+                        print('CPF inválido!')
                 print('\n\033[;1mAbaixo digite a data de seu nascimento em partes, começando com o dia, o mês e o ano.(dd/mm/aaaa)\n\033[m')
                 while True:
-                    dia = int(input("Digite o dia de seu nascimento: "))
-                    mes = int(input("Digite o mês de seu nascimento: "))
+                    dia = str(int(input("Digite o dia de seu nascimento: "))).zfill(2)
+                    mes = str(int(input("Digite o mês de seu nascimento: "))).zfill(2)
                     ano = int(input("E o ano de nascimento: "))
-                    if dia < 1 or dia > 31 or mes < 1 or mes > 12:
+                    if int(dia) < 1 or int(dia) > 31 or int(mes) < 1 or int(mes) > 12:
                         print('\nFormato de data inválido\n')
                     elif ano < 1900:
                         print('\nVocê não tem essa idade!\n')
@@ -30,7 +55,7 @@ class Cadastro:
                 data_de_nascimento = '{}/{}/{}'.format(dia, mes, ano)
                 email = input("\nDigite o seu email: ")
                 while True:
-                    senha = input("\nDigite o sua senha (A senha deve ter entre 6 a 12 dígitos): ")
+                    senha = input("Digite o sua senha (A senha deve ter entre 6 a 12 dígitos): ")
                     if len(senha) < 6:
                         print('Senha muito curta.')
                         continue
@@ -50,12 +75,14 @@ class Cadastro:
                 if self.dados == 'n':
                     print('\n\033[1;91mPor favor, digite seus dados novamente.\033[m\n')
                     continue
+                else:
+                    print('\n\033[1;31mOpção inválida!\033[m\n')
             except:
                 print('\n\n\033[1;31mDigite seus dados corretamente.\033[m\n')
-        cursor.execute(f'INSERT INTO cadastro (nome, sobrenome, data_de_nascimento, cpf, email, senha) VALUES ("{nome}", "{sobrenome}", {data_de_nascimento}, {cpf}, "{email}", "{senha}")')
+        cursor.execute(f'INSERT INTO cadastro (nome, sobrenome, data_de_nascimento, cpf, email, senha) VALUES ("{nome}", "{sobrenome}", "{data_de_nascimento}", {cpf}, "{email}", "{senha}")')
         cursor.execute('SELECT * FROM cadastro')
         conexao.commit()
-
+        
     def Entrar_na_Conta(self, email_confirm, senha_confirm):
         self.email_confirm = email_confirm
         self.senha_confirm = senha_confirm
@@ -111,15 +138,17 @@ class Categorias:
         cursor.execute('SELECT * FROM eletronicos')
         for linha in cursor.fetchall():
             print('\n',linha)
-        
+        print('')        
     def Perifericos(self):
         cursor.execute('SELECT * FROM perifericos')
         for linha in cursor.fetchall():
             print('\n',linha)
+        print('')
     def Jogos(self):
         cursor.execute('SELECT * FROM jogos')
         for linha in cursor.fetchall():
             print('\n',linha)
+        print('')
 class Produtos:
     def __init__(self, Produto, Valor) -> None:
         self.produto = Produto
@@ -141,21 +170,36 @@ class Favoritos:
 
 
 print("\033[1;0m \033[1;106mOLÁ SEJA BEM VINDO A PEDRINHO ELETRONICOS!\033[m \033[m\n\n")
-print("\033[;1mENTRE EM SUA CONTA OU CRIE UMA AGORA A APROVEITE A VARIEDADES DE PRODUTOS\033[m")
-cad = int(input('1.Cadastrar \n2.Entrar na conta \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+print("\033[;1mENTRE E APROVEITE A VARIEDADES DE PRODUTOS\033[m")
+cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
 cadastro = Cadastro()
 match cad:
     case 1:
-        cadastro.Inserir_Dados('','','','','','')
+        cadastro.Inserir_Dados('','','','','','','')
         print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
     case 2:
         cadastro.Entrar_na_Conta('','')
-cc = int(input('\n1.Eletrônicos \n2.Periféricos \n3.Jogos \n\nDigite o número do departamento desejado: \n'))
-categorias = Categorias()
-match cc:
-    case 1:
-        categorias.Eletronicos()
-    case 2:
-        categorias.Perifericos()
     case 3:
-        categorias.Jogos()
+        print('Bem vindo a nossa loja!!!')
+
+while True:
+    cc = int(input('\n1.Eletrônicos \n2.Periféricos \n3.Jogos \n\nDigite o número do departamento desejado: \n'))
+    categorias = Categorias()
+    match cc:
+        case 1:
+            categorias.Eletronicos()
+        case 2:
+            categorias.Perifericos()
+        case 3:
+            categorias.Jogos()
+
+    pg = int(input('1.Ver produtos \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+    match pg:
+        case 1:
+            int(input('Digite o número do produto: \n'))
+        case 2:
+            pass
+        case 3:
+            pass
+        case 4:
+            continue
