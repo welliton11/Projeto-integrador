@@ -154,16 +154,29 @@ class Produtos:
         self.produto = Produto
         self.valor = Valor
 class Pagamentos:
-    def __init__(self, Nome2, CPF2, Numero_do_Cartão, Validade_cartão, CVV, Email5) -> None:
+    def __init__(self, Nome2, CPF2, Numero_do_Cartão, Validade_cartão, CVV, Email5, tipo_pagamento) -> None:
         self.nome2 = Nome2
         self.cpf2 = CPF2
         self.num_cartao = Numero_do_Cartão
         self.validade = Validade_cartão
         self.cvv = CVV
         self.email = Email5
-class Carrinho:
-    def __init__(self, Produto2, Valor2, Email2) -> None:
-        pass
+        self.tipo_pagamento = tipo_pagamento
+        self.tipo_pagamento = int(input('\n1.Cartão de Crédito \n2.Boleto \n3.Pix \n\n\033[;1mSelecione a forma de pagamento: \033[m'))
+        match self.tipo_pagamento:
+            case 1:
+                self.nome2 = input('Digite o nome do titular do cartão: ').upper()
+                self.num_cartao = int(input('Digite o número do cartão: '))
+
+            case 2:
+                pass
+            case 3:
+                pass
+class Carrinho(Pagamentos):
+    def __init__(self, Email2, Produto2, Valor2) -> None:
+        self.email = Email2
+        self.produto2 = Produto2
+        self.valor2 = Valor2
 class Favoritos:
     def __init__(self, Produto3, Valor3, Email3) -> None:
         pass
@@ -171,7 +184,7 @@ class Favoritos:
 
 print("\033[1;0m \033[1;106mOLÁ SEJA BEM VINDO A PEDRINHO ELETRONICOS!\033[m \033[m\n\n")
 print("\033[;1mENTRE E APROVEITE A VARIEDADES DE PRODUTOS\033[m")
-cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n4.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
 cadastro = Cadastro()
 match cad:
     case 1:
@@ -181,9 +194,12 @@ match cad:
         cadastro.Entrar_na_Conta('','')
     case 3:
         print('Bem vindo a nossa loja!!!')
+    case 4:
+        print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
+        exit()
 
 while True:
-    cc = int(input('\n1.Eletrônicos \n2.Periféricos \n3.Jogos \n\nDigite o número do departamento desejado: \n'))
+    cc = int(input('\n\033[1;31mCATEGORIAS DE PRODUTOS \033[m \n31.Eletrônicos \n2.Periféricos \n3.Jogos \n4.Sair \n\nDigite o número do departamento desejado: \n'))
     categorias = Categorias()
     match cc:
         case 1:
@@ -192,8 +208,11 @@ while True:
             categorias.Perifericos()
         case 3:
             categorias.Jogos()
+        case 4:
+            print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
+            exit()
 
-    pg = int(input('1.Ver produtos \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+    pg = int(input('1.Ver produtos \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
     match pg:
         case 1:
             int(input('Digite o número do produto: \n'))
@@ -203,3 +222,6 @@ while True:
             pass
         case 4:
             continue
+        case 5:
+            print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
+            exit()
