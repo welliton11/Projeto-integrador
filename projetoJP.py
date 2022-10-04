@@ -1,3 +1,4 @@
+from Val_Cartao import Cartao
 import sqlite3
 
 
@@ -7,11 +8,10 @@ cursor = conexao.cursor()
 class Cadastro:
     def __init__(self) -> None:
         pass
-    def Inserir_Dados(self, nome, sobrenome, data_de_nascimento, cpf, email, senha, dados):
-        self.dados = dados
+    def Inserir_Dados(self):
         while True:
             try:
-                nome = str(input("Digite seu primeiro nome: ")).capitalize()
+                nome = str(input("\nDigite seu primeiro nome: ")).capitalize()
                 sobrenome = str(input("Digite seu sobrenome: ")).capitalize()
                 while True:
                     cpf = str(input("Digite seu cpf (apenas números): "))
@@ -83,9 +83,7 @@ class Cadastro:
         cursor.execute('SELECT * FROM cadastro')
         conexao.commit()
         
-    def Entrar_na_Conta(self, email_confirm, senha_confirm):
-        self.email_confirm = email_confirm
-        self.senha_confirm = senha_confirm
+    def Entrar_na_Conta(self):
         a = True
         while True:
             self.email_confirm = input('\nEmail: ')
@@ -138,7 +136,7 @@ class Categorias:
         cursor.execute('SELECT * FROM eletronicos')
         for linha in cursor.fetchall():
             print('\n',linha)
-        print('')        
+        print('')
     def Perifericos(self):
         cursor.execute('SELECT * FROM perifericos')
         for linha in cursor.fetchall():
@@ -154,29 +152,35 @@ class Produtos:
         self.produto = Produto
         self.valor = Valor
 class Pagamentos:
-    def __init__(self, Nome2, CPF2, Numero_do_Cartão, Validade_cartão, CVV, Email5, tipo_pagamento) -> None:
-        self.nome2 = Nome2
-        self.cpf2 = CPF2
-        self.num_cartao = Numero_do_Cartão
-        self.validade = Validade_cartão
-        self.cvv = CVV
-        self.email = Email5
-        self.tipo_pagamento = tipo_pagamento
+    def __init__(self) -> None:
+        pass
+    def Formas_Pag(self):
+        cc = Cartao()
         self.tipo_pagamento = int(input('\n1.Cartão de Crédito \n2.Boleto \n3.Pix \n\n\033[;1mSelecione a forma de pagamento: \033[m'))
         match self.tipo_pagamento:
             case 1:
-                self.nome2 = input('Digite o nome do titular do cartão: ').upper()
-                self.num_cartao = int(input('Digite o número do cartão: '))
-
+                self.nome2 = str(input('\n\033[;1mNome do titular do cartão:\033[m\nNome completo: ')).upper()
+                print('\n\033[;1mNúmero do cartão:\033[m')
+                cc.Validar()
+                self.num_cartao = num_cartao
+                self.val_mes = int(input('\n\033[;1mValidade:\033[m\nMês: '))
+                self.val_ano = int(input('\nAno: '))
+                self.validade = '{}/{}'.format(self.val_mes, self.val_ano)
+                self.cvv = input('\n\033[;1mCódigo de segurança:\033[m\nCVV: ')
+                if not self.nome2 or not self.num_cartao or not self.val_ano or not self.val_mes or not self.cvv:
+                    print('Você não pode deixar nenhum campo em branco!')
+                    Pagamentos()
+                
             case 2:
                 pass
             case 3:
                 pass
 class Carrinho(Pagamentos):
-    def __init__(self, Email2, Produto2, Valor2) -> None:
-        self.email = Email2
-        self.produto2 = Produto2
-        self.valor2 = Valor2
+    def __init__(self) -> None:
+        cursor.execute('SELECT * FROM carrinho')
+        for linha in cursor.fetchall():
+            id, email2, produto2, valor2 = linha
+            print('\n',linha)
 class Favoritos:
     def __init__(self, Produto3, Valor3, Email3) -> None:
         pass
@@ -188,10 +192,10 @@ cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n4.S
 cadastro = Cadastro()
 match cad:
     case 1:
-        cadastro.Inserir_Dados('','','','','','','')
+        cadastro.Inserir_Dados()
         print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
     case 2:
-        cadastro.Entrar_na_Conta('','')
+        cadastro.Entrar_na_Conta()
     case 3:
         print('Bem vindo a nossa loja!!!')
     case 4:
@@ -199,7 +203,7 @@ match cad:
         exit()
 
 while True:
-    cc = int(input('\n\033[1;31mCATEGORIAS DE PRODUTOS \033[m \n31.Eletrônicos \n2.Periféricos \n3.Jogos \n4.Sair \n\nDigite o número do departamento desejado: \n'))
+    cc = int(input('\n\033[1;31mCATEGORIAS DE PRODUTOS \033[m \n1.Eletrônicos \n2.Periféricos \n3.Jogos \n4.Sair \n\nDigite o número do departamento desejado: \n'))
     categorias = Categorias()
     match cc:
         case 1:
