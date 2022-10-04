@@ -1,4 +1,5 @@
 from Val_Cartao import Cartao
+import pycep_correios
 import sqlite3
 
 
@@ -155,14 +156,32 @@ class Pagamentos:
     def __init__(self) -> None:
         pass
     def Formas_Pag(self):
-        cc = Cartao()
+        # endereco = pycep_correios.get_address_from_cep(input('\n\033[;1mENDEREÇO DE ENTREGA:\033[m \nDigite seu cep: '))
+        # self.numero = input('Digite o número da casa: ')
+        # self.complemento = input('Digite o complemento: ')
+        # self.rua = print(endereco['logradouro'])
+        # self.bairro = print(endereco['bairro'])
+        # self.cidade = print(endereco['cidade'])
+        # self.uf = print(endereco['uf'])
+        # self.cep = print(endereco['cep'])
+        # print(f'{self.numero} \n{self.complemento}')
+        # gg = input('Os dados acima estão corretos? ("s" ou "n"): ').lower()
+        # if gg == "s":
+        #     pass
+        # elif gg == "n":
+        #     Pagamentos()
+
+        # cursor.execute(f'INSERT INTO endereço (cep, rua, bairro, cidade, uf, numero, complemento) VALUES ("{self.cep}", "{self.rua}", "{self.bairro}", "{self.cidade}", "{self.uf}", "{self.numero}", "{self.complemento}")')
+        # cursor.execute('SELECT * FROM endereço')
+        # conexao.commit()
+        # cc = Cartao()
         self.tipo_pagamento = int(input('\n1.Cartão de Crédito \n2.Boleto \n3.Pix \n\n\033[;1mSelecione a forma de pagamento: \033[m'))
         match self.tipo_pagamento:
             case 1:
                 self.nome2 = str(input('\n\033[;1mNome do titular do cartão:\033[m\nNome completo: ')).upper()
                 print('\n\033[;1mNúmero do cartão:\033[m')
-                cc.Validar()
-                self.num_cartao = num_cartao
+                cc = Cartao()
+                self.num_cartao = cc.Validar()
                 self.val_mes = int(input('\n\033[;1mValidade:\033[m\nMês: '))
                 self.val_ano = int(input('\nAno: '))
                 self.validade = '{}/{}'.format(self.val_mes, self.val_ano)
@@ -170,7 +189,9 @@ class Pagamentos:
                 if not self.nome2 or not self.num_cartao or not self.val_ano or not self.val_mes or not self.cvv:
                     print('Você não pode deixar nenhum campo em branco!')
                     Pagamentos()
-                
+                if self.val_mes != 2 or self.val_ano != 4 or self.cvv < 3 or self.cvv > 4:
+                    print('Por favor, digite corretamente!')
+                    Pagamentos()                
             case 2:
                 pass
             case 3:
@@ -198,6 +219,8 @@ match cad:
         cadastro.Entrar_na_Conta()
     case 3:
         print('Bem vindo a nossa loja!!!')
+        pag = Pagamentos()
+        pag.Formas_Pag()
     case 4:
         print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
         exit()
