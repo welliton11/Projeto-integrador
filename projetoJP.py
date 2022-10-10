@@ -1,6 +1,7 @@
 from Val_Cartao import Cartao
 import pycep_correios
 import sqlite3
+import time
 
 
 conexao = sqlite3.connect("projeto_pj_DB.db")
@@ -73,31 +74,25 @@ class Cadastro:
                 self.dados = input(f'\n\033[;1mNome: {nome} \nSobrenome: {sobrenome} \nCPF: {cpf} \nData de Nascimento: {data_de_nascimento} \nEmail: {email}\n \nOs dados acima estão corretos? ("s" ou "n")\033[m\n').lower()
                 if self.dados == 's':
                     break
-                if self.dados == 'n':
+                elif self.dados == 'n':
                     print('\n\033[1;91mPor favor, digite seus dados novamente.\033[m\n')
                     continue
                 else:
-                    print('\n\033[1;31mOpção inválida!\033[m\n')
+                    print('\n\033[1;31mOpção inválida! Por favor, digite corretamente.\033[m\n')
             except:
                 print('\n\n\033[1;31mDigite seus dados corretamente.\033[m\n')
-        cursor.execute(f'INSERT INTO cadastro (nome, sobrenome, data_de_nascimento, cpf, email, senha) VALUES ("{nome}", "{sobrenome}", "{data_de_nascimento}", {cpf}, "{email}", "{senha}")')
-        cursor.execute('SELECT * FROM cadastro')
-        conexao.commit()
-        cursor.execute(f'INSERT INTO carrinho (email2) VALUES ("{email}")')
-        cursor.execute('SELECT * FROM carrinho')
-        conexao.commit()
-        cursor.execute(f'INSERT INTO favoritos (email3) VALUES ("{email}")')
-        cursor.execute('SELECT * FROM favoritos')
-        conexao.commit()
-        cursor.execute(f'INSERT INTO endereço (email4) VALUES ("{email}")')
-        cursor.execute('SELECT * FROM endereço')
-        conexao.commit()
-        cursor.execute(f'INSERT INTO cartao_de_credito (email5) VALUES ("{email}")')
-        cursor.execute('SELECT * FROM cartao_de_credito')
-        conexao.commit()
-        cursor.execute(f'INSERT INTO cadastro (email6) VALUES ("{email}")')
-        cursor.execute('SELECT * FROM cadastro')
-        conexao.commit()
+                continue
+            try:
+                cursor.execute(f'INSERT INTO cadastro (nome, sobrenome, data_de_nascimento, cpf, email, senha) VALUES ("{nome}", "{sobrenome}", "{data_de_nascimento}", {cpf}, "{email}", "{senha}")')
+                cursor.execute('SELECT * FROM cadastro')
+                conexao.commit()
+                cursor.execute(f'INSERT INTO compras_realizadas (email6) VALUES ("{email}")')
+                cursor.execute('SELECT * FROM compras_realizadas')
+                conexao.commit()
+                break
+            except:
+                print('\n\033[1;31mEmail já existente.\n\033[m')
+                continue
         
     def Entrar_na_Conta(self):
         a = True
@@ -151,137 +146,319 @@ class Categorias:
     def Eletronicos(self):
         cursor.execute('SELECT * FROM eletronicos')
         for linha in cursor.fetchall():
-            print('\n',linha)
-        print('')
+            n_id, prod, rs = linha
+            print(f'\033[;1m{n_id}-\033[m{prod}, R${rs}\n')
     def Perifericos(self):
         cursor.execute('SELECT * FROM perifericos')
         for linha in cursor.fetchall():
-            print('\n',linha)
-        print('')
+            n_id, prod, rs = linha
+            print(f'\033[;1m{n_id}-\033[m{prod}, R${rs}\n')
     def Jogos(self):
         cursor.execute('SELECT * FROM jogos')
         for linha in cursor.fetchall():
-            print('\n',linha)
-        print('')
+            n_id, prod, rs = linha
+            print(f'\033[;1m{n_id}-\033[m{prod}, R${rs}\n')
+
 class Produtos:
-    def __init__(self, Produto, Valor) -> None:
-        self.produto = Produto
-        self.valor = Valor
-class Pagamentos:
     def __init__(self) -> None:
         pass
-    def Formas_Pag(self):
-        while True:
-            m = True
-            contador = 0
-            while m == True:
-                self.email_test = input('Para continuar, digite seu email: ')
-                cursor.execute('SELECT * FROM cartão_de_credito')
-                for linha in cursor.fetchall():
-                    if linha == self.email_test:
-                        cursor.execute(f'SELECT * FROM cartão_de_credito WHERE email = "{self.email_test}"')
-                        for i in cursor.fetchall():
-                            for j in i:
-                                if j != None:
-                                    contador +=1
-                        m = False
-                        if contador <= 2:
-                            utilizar_cartão = ('Você ja tem um cartão salvo, deseja utilizá-lo? ("s" ou "n"): ').lower()
-                            if utilizar_cartão == "s":
-                                pass # ** DESENVOLVER ESTA PARTE **
-                            elif utilizar_cartão == "n":
-                                break
-                            else:
-                                print('Opção inválida, seu endereço não será salvo!!')
-                                break
-                        break
-                print('Você digitou o email errado, digite novamente.')
-            while True:
-                endereco = pycep_correios.get_address_from_cep(input('\n\033[;1mENDEREÇO DE ENTREGA:\033[m \nDigite seu cep: '))
-                self.numero = input('Digite o número da casa: ')
-                self.complemento = input('Digite o complemento: ')
-                self.rua = print(endereco['logradouro'])
-                self.bairro = print(endereco['bairro'])
-                self.cidade = print(endereco['cidade'])
-                self.uf = print(endereco['uf'])
-                self.cep = print(endereco['cep'])
-                print(f'{self.numero} \n{self.complemento}')
-                gg = str(input('Os dados acima estão corretos? ("s" ou "n"): ')).lower()
-                if gg == "s":
-                    pass
-                elif gg == "n":
-                    continue
-                salvar_endereço = input('Você deseja salvar seu endereço para compras futuras? ("s" ou "n"): ').lower()
-                if salvar_endereço == "s":
-                    pass
-                elif salvar_endereço == "n":
+    def Prodd(self):
+        t = True
+        selecionar = int(input('Digite o número do produto: \n'))                
+        cursor.execute(f'SELECT * FROM {cc} WHERE id = {selecionar}')
+        for linha in cursor.fetchall():
+            num_id, produto, valor = linha
+            print(f'\n\033[;1m{num_id}-\033[m {produto} \nR${valor}\n')
+        esc = int(input('1.Adicionar ao carrinho \n2.Adicionar à Lista de Desejos \n3.Voltar \n\nEscolha a opção desejada: '))
+        while t == True:
+            email_test = input('Para continuar, digite seu email: ')
+            cursor.execute('SELECT * FROM cadastro')
+            for linha in cursor.fetchall():
+                if linha[4] == email_test:
+                    t = False
                     break
+            if t == True:
+                print('Você digitou o email errado, digite novamente.')
+        match esc:
+            case 1:
+                cursor.execute('SELECT * FROM carrinho')
+                cursor.execute(f'INSERT INTO carrinho (email2, produto2, valor2) VALUES ("{email_test}", "{produto}", "{valor}"')
+                conexao.commit()
+                print('Adicionado ao carrinho!!')
+            case 2:
+                cursor.execute(f'INSERT INTO favoritos (email3, produto3, valor3) VALUES ("{email_test}", "{produto}", "{valor}"')
+                conexao.commit()
+                print('Adicionado à Lista de Desejos!!')
+            case 3:
+                pass
+
+class Carrinho(Produtos):
+    def __init__(self) -> None:
+        pass
+    def Carrinho_compras(self):
+        self.email_test = input('\nPara continuar, digite seu email: ')
+        self.total = 0
+        m = True
+        while m == True:
+                cursor.execute('SELECT * FROM carrinho')
+                for linha in cursor.fetchall():
+                    if linha[1] == self.email_test:
+                        m = False                        
+                        break
+                if m == True:
+                    print('Você digitou o email errado, digite novamente.')
+        cursor.execute(f'SELECT * FROM carrinho WHERE email = "{self.email_test}"')
+        for linha in cursor.fetchall():
+            print('\n',linha)
+            self.total += linha[3]
+        options = int(input(f'\n\033[;1mTOTAL: {float(self.total)}\033[m \n1.Comprar \n2.Remover do carrinho \n3.Aumentar/diminuir quantidade de produto(s) \n4.Voltar \n\nDigite a opção desejada: '))
+        tttt = True
+        while tttt == True:
+            cursor.execute('SELECT * FROM cadastro')
+            for linha in cursor.fetchall():
+                if self.email_test == linha:
+                    tttt = False
+                    break
+            if tttt == True:
+                print('\nVocê digitou o email errado, digite novamente.\n')
+        match options:
+            case 1:
+                pagg = Pagamentos()
+                pagg.Formas_Pag()
+            case 2:
+                ttt = True
+                num_id = int(input('\nDigite o id do produto que deseja excluir: '))
+                cursor.execute(f'SELECT * FROM carrinho WHERE email = "{self.email_test}"')
+                for linha in cursor.fetchall():
+                    if linha[0] == num_id:
+                        ttt = False
+                        break
+                if ttt == True:
+                    print('\nVocê não tem este produto no seu carrinho!!\n')
+                    carr.Carrinho_compras()
+                    
+                cursor.execute('DELETE FROM carrinho WHERE id = ?, email = ?', (num_id, self.email_test))
+                conexao.commit()
+                print('Produto removido!!')
+            case 3:
+                pass
+            case 4:
+                pass
+
+class Pagamentos(Carrinho):
+    def __init__(self) -> None:
+        super().__init__()
+    def Formas_Pag(self):
+        aaa = True
+        bbb = True
+        m = True
+        contador = 0
+        cursor.execute('SELECT * FROM cartao_de_credito')
+        for linha in cursor.fetchall():
+            if linha[5] == self.email_test:
+                utilizar_cartão = ('Você ja tem cartão de crédito salvo, deseja utilizá-lo? ("s" ou "n"): ').lower()
+                if utilizar_cartão == "s":
+                    bbb = False
+                    cursor.execute(f'SELECT * FROM cartao_de_credito WHERE email = "{self.email_test}"')
+                    for linha in cursor.fetchall():
+                        num_id2, nome, numero_do_cartao, validade_cartao, cvv = linha
+                        print(f'\n{num_id2}. {nome}, {numero_do_cartao}, {validade_cartao}\n')
+                        contador += 1
+                    if contador >= 2:
+                        while True:
+                            cartao_salvo = int(input(f'Escolha o cartão que deseja utilizar (1 ao {contador}): '))
+                            if cartao_salvo > contador or cartao_salvo < 1:
+                                print('Opção inválida, por favor digite corretamente.')
+                                continue
+                            break
+                        cursor.execute(f'SELECT * FROM cartao_de_credito WHERE email = "{self.email_test}", id = {contador}')
+                        for linha in cursor.fetchall():
+                            num_id2, nome, numero_do_cartao, validade_cartao, cvv = linha
+                            print(f'{num_id2}. {nome}, {numero_do_cartao}, {validade_cartao}')
+                    contador = 0
+                    while True:
+                        confirm_cvv = int(input('Digite o cvv do cartão para continuar: '))
+                        if confirm_cvv == cvv:
+                            break
+                        contador += 1
+                        if contador == 3:
+                            print('Limite de tentativas excedidos, tente novamente mais tarde!')
+                            carr.Carrinho_compras()
+                            break
+                        if confirm_cvv != cvv:
+                            print('Código cvv incorreto!!')
+                            continue
+                elif utilizar_cartão == "n":
+                    pass
+                else:
+                    print('Opção inválida!')
+                    carr.Carrinho_compras()
+
+        cursor.execute('SELECT * FROM endereço')
+        for linha in cursor.fetchall():
+            if linha[8] == self.email_test:
+                contador = 0
+                utilizar_endereco = ('Você ja tem esse endereço salvo, deseja utilizá-lo? ("s" ou "n"): ').lower()
+                if utilizar_endereco == "s":
+                    aaa = False
+                    cursor.execute(f'SELECT * FROM endereço WHERE email = "{self.email_test}"')
+                    for linha in cursor.fetchall():
+                        num_id3, cep, rua, bairro, cidade, uf, numero, complemento = linha
+                        print(f'\n\033[;1m{num_id3}:\033[m \n{cep} \n{rua}, {numero} \n{complemento} \n{bairro} \n{cidade} \n{uf} \n')
+                        contador += 1
+                    if contador >= 2:
+                        while True:
+                            endereco_salvo = int(input(f'Escolha o endereço que deseja utilizar (1 ao {contador}): '))
+                            if endereco_salvo > contador or endereco_salvo < 1:
+                                print('\nOpção inválida, por favor digite corretamente.\n')
+                                continue
+                            break
+                        cursor.execute(f'SELECT * FROM endereço WHERE email = "{self.email_test}", id = {contador}')
+                        for linha in cursor.fetchall():
+                            num_id3, cep, rua, bairro, cidade, uf, numero, complemento = linha
+                            print(f'\n{cep} \n{rua}, {numero} \n{complemento} \n{bairro} \n{cidade} \n{uf} \n')
+                    self.cep = cep
+                    self.rua = rua
+                    self.bairro = bairro
+                    self.cidade = cidade
+                    self.uf = uf
+                    self.numero = numero
+                    self.complemento = complemento
+                elif utilizar_endereco == "n":
+                    pass
                 else:
                     print('Opção inválida, seu endereço não será salvo!!')
-                    break
-                cursor.execute(f'INSERT INTO endereço (cep, rua, bairro, cidade, uf, numero, complemento) VALUES ("{self.cep}", "{self.rua}", "{self.bairro}", "{self.cidade}", "{self.uf}", "{self.numero}", "{self.complemento}")')
-                cursor.execute('SELECT * FROM endereço')
-                conexao.commit()
-                break
+                    carr.Carrinho_compras()
 
-            while True:
-                self.nome2 = str(input('\n\033[;1mNome do titular do cartão:\033[m\nNome completo: ')).upper()
-                print('\n\033[;1mNúmero do cartão:\033[m')
-                cc = Cartao()
-                self.num_cartao = cc.Validar()
-                self.val_mes = int(input('\n\033[;1mValidade:\033[m\nMês: '))
-                self.val_ano = int(input('\nAno: '))
-                self.validade = '{}/{}'.format(self.val_mes, self.val_ano)
-                self.cvv = input('\n\033[;1mCódigo de segurança:\033[m\nCVV: ')
-                if not self.nome2 or not self.num_cartao or not self.val_ano or not self.val_mes or not self.cvv:
-                    print('\nVocê não pode deixar nenhum campo em branco!\n')
-                    continue
-                if self.val_mes != 2 or self.val_ano != 4 or self.cvv < 3 or self.cvv > 4:
-                    print('\nPor favor, digite corretamente!\n')
-                    continue
-                print(f'\n{self.nome2} \n{self.num_cartao} \n{self.validade} \n{self.cvv} \n')
-                self.hh = int(input('Os dados acima estão corretos? ("s" ou "n"): ')).lower()
-                if self.hh == "n":
-                    print('Ok, digite novamente seus dados!')
-                    continue
-                elif self.hh == "s":
-                    pass
-                else:
-                    print('Opção inválida, refaça novamente seus dados!')
-                    continue
-                break
-            m = True
-            while m == True:
-                self.email_test = input('Para continuar, digite seu email novamente: ')
-                cursor.execute('SELECT * FROM cartão_de_credito')
-                for linha in cursor.fetchall():
-                    if linha == self.email_test:
-                        m = False
-                        break
-                print('Você digitou o email errado, digite novamente.')
-            salvar_cartao = input('Você deseja salvar seu cartão para compras futuras? ("s" ou "n"): ').lower()
-            if salvar_cartao == "s":
+        while aaa == True:
+            endereco = pycep_correios.get_address_from_cep(input('\n\033[;1mENDEREÇO DE ENTREGA:\033[m \nDigite seu cep: '))
+            self.numero = input('Digite o número da casa: ')
+            self.complemento = input('Digite o complemento (casa, apartamento ou comercial): ').capitalize()
+            if not self.numero or not self.complemento:
+                print('Todos os campos são obrigatórios.')
+                continue
+            self.rua = print(endereco['\033[;1mlogradouro'].capitalize())
+            self.bairro = print(endereco['bairro'].capitalize())
+            self.cidade = print(endereco['cidade'].capitalize())
+            self.uf = print(endereco['uf'].upper())
+            self.cep = print(endereco['cep'])
+            print(f'{self.numero} \n{self.complemento}\033[m'.capitalize())
+            gg = str(input('Os dados acima estão corretos? ("s" ou "n"): ')).lower()
+            if gg == "s":
                 pass
-            elif salvar_cartao == "n":
+            elif gg == "n":
+                continue
+            salvar_endereço = input('Você deseja salvar seu endereço para compras futuras? ("s" ou "n"): ').lower()
+            if salvar_endereço == "s":
+                pass
+            elif salvar_endereço == "n":
                 break
             else:
-                print('Opção inválida, seu cartão não será salvo!!')
+                print('Opção inválida, seu endereço não será salvo!!')
                 break
-            cursor.execute(f'UPDATE cartao_de_credito SET nome2 = ?, numero_do_cartao = ?, validade_cartao = ?, cvv = ? WHERE email = "{self.email_test}"', (self.nome2, self.num_cartao, self.validade, self.cvv))
-            cursor.execute('SELECT * FROM cartao_de_credito')
+            cursor.execute(f'INSERT INTO endereço (cep, rua, bairro, cidade, uf, numero, complemento, email4) VALUES ("{self.cep}", "{self.rua}", "{self.bairro}", "{self.cidade}", "{self.uf}", "{self.numero}", "{self.complemento}", "{self.email_test}")')
+            cursor.execute('SELECT * FROM endereço')
             conexao.commit()
             break
 
-class Carrinho(Pagamentos):
-    def __init__(self) -> None:
-        cursor.execute('SELECT * FROM carrinho')
-        for linha in cursor.fetchall():
-            id, email2, produto2, valor2 = linha
-            print('\n',linha)
-class Favoritos:
-    def __init__(self, Produto3, Valor3, Email3) -> None:
-        pass
+        while bbb == True:
+            self.nome2 = str(input('\n\033[;1mNome do titular do cartão:\033[m \nNome completo: ')).upper()
+            print('\n\033[;1mNúmero do cartão:\033[m')
+            cc = Cartao()
+            self.num_cartao = cc.Validar()
+            self.val_mes = int(input('\n\033[;1mValidade:\033[m\nMês: '))
+            self.val_ano = int(input('\nAno: '))
+            self.validade = '{}/{}'.format(self.val_mes, self.val_ano)
+            self.cvv = input('\n\033[;1mCódigo de segurança:\033[m\nCVV: ')
+            if not self.nome2 or not self.num_cartao or not self.val_ano or not self.val_mes or not self.cvv:
+                print('\nVocê não pode deixar nenhum campo em branco!\n')
+                continue
+            if self.val_mes != 2 or self.val_ano != 4 or self.cvv < 3 or self.cvv > 4:
+                print('\nPor favor, digite corretamente!\n')
+                continue
+            print(f'\n{self.nome2} \n{self.num_cartao} \n{self.validade} \n{self.cvv} \n')
+            self.hh = int(input('Os dados acima estão corretos? ("s" ou "n"): ').lower())
+            if self.hh == "n":
+                print('Ok, digite novamente seus dados!')
+                continue
+            elif self.hh == "s":
+                break
+            else:
+                print('Opção inválida, refaça novamente seus dados!')
+                continue
 
+        while True:
+            self.parcelas = int(input('Você pode parcelar em até 8x sem juros ou em até 12x com juros de 3,5% no cartão. Digite de 1 à 12 de acordo com o número de parcelas desejadas: '))
+            if self.parcelas >= 1 and self.parcelas <= 8:
+                calculo = self.total / self.parcelas
+                print(f'\nParcelas: {self.parcelas}x de {calculo} \nTotal: {self.total}\n')
+                break
+            elif self.parcelas >= 9 and self.parcelas <= 12:
+                calculo = self.total / self.parcelas
+                calculo_juros = calculo + (calculo*(3,5/100))
+                novo_total = calculo_juros * self.parcelas
+                print(f'\nParcelas: {self.parcelas}x de {calculo_juros} \nTotal: {novo_total}\n')
+            else:
+                print('Opção inválida, você só pode digitar de 1 à 12!')
+                continue
+
+        salvar_cartao = input('Você deseja salvar seu cartão para compras futuras? ("s" ou "n"): ').lower()
+        m = True
+        if salvar_cartao == "s":
+            m = False
+        elif salvar_cartao == "n":
+            pass
+        else:
+            print('Opção inválida, seu cartão não será salvo!!')
+
+        if m == False:
+            cursor.execute(f'INSERT INTO endereço (nome2, num_cartao, validade, cvv, email5) VALUES ("{self.nome2}", "{self.num_cartao}", "{self.validade}", "{self.cvv}", "{self.email_test}")')
+            cursor.execute('SELECT * FROM cartao_de_credito')
+            conexao.commit()
+            print('\nCartão salvo !!\n')
+
+class Favoritos(Carrinho, Produtos):
+    def __init__(self) -> None:
+        super().__init__()
+    def Lista_desejos(self):
+        if self.email_test == None:
+            self.email_test = input('\nPara continuar, digite seu email: ')
+        m = True
+        while m == True:
+                cursor.execute('SELECT * FROM favoritos')
+                for linha in cursor.fetchall():
+                    if linha[1] == self.email_test:
+                        m = False
+                        break
+                if m == True:
+                    print('Você digitou o email errado, digite novamente.')
+        cursor.execute(f'SELECT * FROM favoritos WHERE email = "{self.email_test}"')
+        for linha in cursor.fetchall():
+            num_id, produto, valor = linha
+            print(f'{num_id}.{produto} R${valor}')
+        esc2 = int(input('1.Adicionar ao carrinho \n2.Remover da Lista de Desejos \n3.Voltar \n\nEscolha a opção desejada: '))
+        match esc2:
+                case 1:
+                    cursor.execute(f'INSERT INTO carrinho (id, email2, produto2, valor2) VALUES ("{num_id}", "{email_test}", "{produto}", "{valor}"')
+                    conexao.commit()
+                    print('Adicionado ao carrinho!!')
+                case 2:
+                    ttt = True
+                    num_id = int(input('\nDigite o id do produto que deseja excluir: '))
+                    cursor.execute(f'SELECT * FROM favoritos WHERE email = "{self.email_test}"')
+                    for linha in cursor.fetchall():
+                        if linha[0] == num_id:
+                            ttt = False
+                            break
+                    if ttt == True:
+                        print('\nVocê não tem este produto na sua lista de desejos!!\n')
+                        favoritos.Lista_desejos()
+                        
+                    cursor.execute('DELETE FROM favoritos WHERE id = ?, email = ?', (num_id, self.email_test))
+                    conexao.commit()
+                    print('Produto removido!!')
+                case 3:
+                    pass
 
 print("\033[1;0m \033[1;106mOLÁ SEJA BEM VINDO A PEDRINHO ELETRONICOS!\033[m \033[m\n\n")
 print("\033[;1mENTRE E APROVEITE A VARIEDADES DE PRODUTOS\033[m")
@@ -307,22 +484,38 @@ while True:
     match cc:
         case 1:
             categorias.Eletronicos()
+            cc = "eletronicos"
         case 2:
             categorias.Perifericos()
+            cc = 'perifericos'
         case 3:
             categorias.Jogos()
+            cc = 'jogos'
         case 4:
             print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
             exit()
 
-    pg = int(input('1.Ver produtos \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+    pg = int(input('1.Selecione produto \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
     match pg:
         case 1:
-            int(input('Digite o número do produto: \n'))
+            pp = Produtos()
+            pp.Prodd()
+
         case 2:
-            pass
+            carr = Carrinho()
+            carr.Carrinho_compras()
+
+            def progresso(a):
+                print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+            def test():
+                for n in range(101):
+                    progresso(n/100)
+                    time.sleep(0.01)
+            test()
+            print('\nObrigado pela compra\n')
         case 3:
-            pass
+            favoritos = Favoritos()
+            favoritos.Lista_desejos()
         case 4:
             continue
         case 5:
