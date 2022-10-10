@@ -460,10 +460,11 @@ class Favoritos(Carrinho, Produtos):
                 case 3:
                     pass
 
-print("\033[1;0m \033[1;106mOLÁ SEJA BEM VINDO A PEDRINHO ELETRONICOS!\033[m \033[m\n\n")
+print("\033[1;0m\033[1;106m Olá, Bem vindo à PEDRINHO ELETRONICOS! \033[m \033[m\n\n")
 print("\033[;1mENTRE E APROVEITE A VARIEDADES DE PRODUTOS\033[m")
 cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n4.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
 cadastro = Cadastro()
+convidado1 = True
 match cad:
     case 1:
         cadastro.Inserir_Dados()
@@ -472,52 +473,132 @@ match cad:
         cadastro.Entrar_na_Conta()
     case 3:
         print('Bem vindo a nossa loja!!!')
-        pag = Pagamentos()
-        pag.Formas_Pag()
+        convidado1 = False
     case 4:
         print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
         exit()
 
 while True:
-    cc = int(input('\n\033[1;31mCATEGORIAS DE PRODUTOS \033[m \n1.Eletrônicos \n2.Periféricos \n3.Jogos \n4.Sair \n\nDigite o número do departamento desejado: \n'))
-    categorias = Categorias()
-    match cc:
+    dd = int(input('\n\033[1;0m\033[1;106m PEDRINHO ELETRÔNICOS \033[m \033[m \n1.Departamentos \n2.Carrinho de compras \n3.Lista de desejos \n4.Sair \n\nDigite a opção desejada: \n'))
+    match dd:
         case 1:
-            categorias.Eletronicos()
-            cc = "eletronicos"
+            pass
         case 2:
-            categorias.Perifericos()
-            cc = 'perifericos'
+            if convidado1 == True:
+                carr = Carrinho()
+                carr.Carrinho_compras()
+
+                def progresso(a):
+                    print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+                def test():
+                    for n in range(101):
+                        progresso(n/100)
+                        time.sleep(0.01)
+                test()
+                print('\n\033[0;32m\033[1mOBRIGADO PELA COMPRA!!!\n\033[m\033[m')
+
+            elif convidado1 == False:
+                print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
+                cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
+                match cdd:
+                    case 1:
+                        cadastro.Inserir_Dados()
+                        print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
+                        continue
+                    case 2:
+                        continue
         case 3:
-            categorias.Jogos()
-            cc = 'jogos'
+            if convidado1 == True:
+                favoritos = Favoritos()
+                favoritos.Lista_desejos()
+
+                continue
+            elif convidado1 == False:
+                print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
+                cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
+                match cdd:
+                    case 1:
+                        cadastro.Inserir_Dados()
+                        print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
+                        continue
+                    case 2:
+                        continue
         case 4:
             print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
             exit()
 
-    pg = int(input('1.Selecione produto \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Departamentos \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
-    match pg:
-        case 1:
-            pp = Produtos()
-            pp.Prodd()
+    while True:
+        cc = int(input('\n\033[1;31mCATEGORIAS DE PRODUTOS \033[m \n1.Eletrônicos \n2.Periféricos \n3.Jogos \n4.Sair \n\nDigite o número do departamento desejado: \n'))
+        categorias = Categorias()
+        match cc:
+            case 1:
+                categorias.Eletronicos()
+                cc = "eletronicos"
+            case 2:
+                categorias.Perifericos()
+                cc = 'perifericos'
+            case 3:
+                categorias.Jogos()
+                cc = 'jogos'
+            case 4:
+                print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
+                exit()
 
-        case 2:
-            carr = Carrinho()
-            carr.Carrinho_compras()
+        pg = int(input('1.Selecione produto \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Início \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+        match pg:
+            case 1:
+                if convidado1 == True:
+                    pp = Produtos()
+                    pp.Prodd()
+                elif convidado1 == False:
+                    print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
+                    cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
+                    match cdd:
+                        case 1:
+                            cadastro.Inserir_Dados()
+                            print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
+                            break
+                        case 2:
+                            break
+            case 2:
+                if convidado1 == True:
+                    carr = Carrinho()
+                    carr.Carrinho_compras()
 
-            def progresso(a):
-                print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
-            def test():
-                for n in range(101):
-                    progresso(n/100)
-                    time.sleep(0.01)
-            test()
-            print('\nObrigado pela compra\n')
-        case 3:
-            favoritos = Favoritos()
-            favoritos.Lista_desejos()
-        case 4:
-            continue
-        case 5:
-            print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
-            exit()
+                    def progresso(a):
+                        print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+                    def test():
+                        for n in range(101):
+                            progresso(n/100)
+                            time.sleep(0.01)
+                    test()
+                    print('\n\033[0;32m\033[1mOBRIGADO PELA COMPRA!!!\n\033[m\033[m')
+                elif convidado1 == False:
+                    print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
+                    cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
+                    match cdd:
+                        case 1:
+                            cadastro.Inserir_Dados()
+                            print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
+                            break
+                        case 2:
+                            break
+            case 3:
+                if convidado1 == True:
+                    favoritos = Favoritos()
+                    favoritos.Lista_desejos()
+                elif convidado1 == False:
+                    print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
+                    cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
+                    match cdd:
+                        case 1:
+                            cadastro.Inserir_Dados()
+                            print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
+                            break
+                        case 2:
+                            break
+            case 4:
+                break
+            case 5:
+                print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
+                exit()

@@ -8,3 +8,4 @@ def test():
         progresso(n/100)
         time.sleep(0.01)
 test()
+print('\n\033[0;32m\033[1mOBRIGADO PELA COMPRA!!!\n\033[m\033[m')
