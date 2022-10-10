@@ -196,59 +196,69 @@ class Carrinho(Produtos):
     def __init__(self) -> None:
         pass
     def Carrinho_compras(self):
-        self.email_test = input('\nPara continuar, digite seu email: ')
+        carrinho_sair = True
+        contador = 0
         self.total = 0
         m = True
         while m == True:
-                cursor.execute('SELECT * FROM carrinho')
-                for linha in cursor.fetchall():
-                    if linha[1] == self.email_test:
-                        m = False                        
-                        break
-                if m == True:
-                    print('Você digitou o email errado, digite novamente.')
-        cursor.execute(f'SELECT * FROM carrinho WHERE email = "{self.email_test}"')
-        for linha in cursor.fetchall():
-            print('\n',linha)
-            self.total += linha[3]
-        options = int(input(f'\n\033[;1mTOTAL: {float(self.total)}\033[m \n1.Comprar \n2.Remover do carrinho \n3.Aumentar/diminuir quantidade de produto(s) \n4.Voltar \n\nDigite a opção desejada: '))
-        tttt = True
-        while tttt == True:
+            self.email_test = input('\nPara continuar, digite seu email: ')
             cursor.execute('SELECT * FROM cadastro')
             for linha in cursor.fetchall():
-                if self.email_test == linha:
-                    tttt = False
+                if linha[4] == self.email_test:
+                    m = False
                     break
-            if tttt == True:
-                print('\nVocê digitou o email errado, digite novamente.\n')
-        match options:
-            case 1:
-                pagg = Pagamentos()
-                pagg.Formas_Pag()
-            case 2:
-                ttt = True
-                num_id = int(input('\nDigite o id do produto que deseja excluir: '))
-                cursor.execute(f'SELECT * FROM carrinho WHERE email = "{self.email_test}"')
-                for linha in cursor.fetchall():
-                    if linha[0] == num_id:
-                        ttt = False
-                        break
-                if ttt == True:
-                    print('\nVocê não tem este produto no seu carrinho!!\n')
-                    carr.Carrinho_compras()
-                    
-                cursor.execute('DELETE FROM carrinho WHERE id = ?, email = ?', (num_id, self.email_test))
-                conexao.commit()
-                print('Produto removido!!')
-            case 3:
-                pass
-            case 4:
-                pass
+            if m == True:
+                print('Você digitou o email errado, digite novamente.')
+        cursor.execute(f'SELECT * FROM carrinho WHERE email2 = "{self.email_test}"')
+        for linha in cursor.fetchall():
+            n_id7, emmail7, jogo7, valors7 = linha
+            print(f'\n\033[1m{n_id7}-\033[m {jogo7}, R${valors7}')
+            self.total += linha[3]
+            contador += 1
+        if contador == 0:
+            print('Seu carrinho está vazio!!')
+            carrinho_sair = False
+        while carrinho_sair == True:
+            options = int(input(f'\n\033[;1mTOTAL: R$ {float(self.total)}\033[m \n\n1.Comprar \n2.Remover do carrinho \n3.Aumentar/diminuir quantidade de produto(s) \n4.Voltar \n\nDigite a opção desejada: '))
+            match options:
+                case 1:
+                    pagg = Pagamentos()
+                    pagg.Formas_Pag()
+                case 2:
+                    ttt = True
+                    num_id = int(input('\nDigite o id do produto que deseja excluir: '))
+                    cursor.execute(f'SELECT * FROM carrinho WHERE email2 = "{self.email_test}"')
+                    for linha in cursor.fetchall():
+                        if linha[0] == num_id:
+                            ttt = False
+                            break
+                    if ttt == True:
+                        print('\nVocê não tem este produto no seu carrinho!!\n')
+                        carr.Carrinho_compras()
+                    cursor.execute(f'SELECT * FROM carrinho WHERE email2 = "{self.email_test}"')
+                    cursor.execute('DELETE FROM carrinho WHERE id = ?', (num_id,))
+                    conexao.commit()
+                    print('Produto removido!!')
+                case 3:
+                    pass
+                case 4:
+                    pass
 
 class Pagamentos(Carrinho):
     def __init__(self) -> None:
         super().__init__()
     def Formas_Pag(self):
+        m = True
+        while m == True:
+            self.email_test = input('\nPara continuar, digite seu email: ')
+            cursor.execute('SELECT * FROM cadastro')
+            for linha in cursor.fetchall():
+                if linha[4] == self.email_test:
+                    m = False
+                    break
+            if m == True:
+                print('Você digitou o email errado, digite novamente.')
+        comprar_vv = True
         aaa = True
         bbb = True
         m = True
@@ -256,6 +266,7 @@ class Pagamentos(Carrinho):
         cursor.execute('SELECT * FROM cartao_de_credito')
         for linha in cursor.fetchall():
             if linha[5] == self.email_test:
+                comprar_vv == False
                 utilizar_cartão = ('Você ja tem cartão de crédito salvo, deseja utilizá-lo? ("s" ou "n"): ').lower()
                 if utilizar_cartão == "s":
                     bbb = False
@@ -293,6 +304,8 @@ class Pagamentos(Carrinho):
                 else:
                     print('Opção inválida!')
                     carr.Carrinho_compras()
+            elif comprar_vv == True:
+                pass
 
         cursor.execute('SELECT * FROM endereço')
         for linha in cursor.fetchall():
@@ -331,19 +344,20 @@ class Pagamentos(Carrinho):
                     carr.Carrinho_compras()
 
         while aaa == True:
-            endereco = pycep_correios.get_address_from_cep(input('\n\033[;1mENDEREÇO DE ENTREGA:\033[m \nDigite seu cep: '))
+            endereco = pycep_correios.get_address_from_cep(input('\n\033[;1mENDEREÇO DE ENTREGA:\033[m \n\nDigite seu cep: '))
             self.numero = input('Digite o número da casa: ')
             self.complemento = input('Digite o complemento (casa, apartamento ou comercial): ').capitalize()
             if not self.numero or not self.complemento:
                 print('Todos os campos são obrigatórios.')
                 continue
-            self.rua = print(endereco['\033[;1mlogradouro'].capitalize())
+            BOLD    = "\033[;1m"
+            self.rua = print('\n', BOLD + endereco['logradouro'].capitalize())
             self.bairro = print(endereco['bairro'].capitalize())
             self.cidade = print(endereco['cidade'].capitalize())
             self.uf = print(endereco['uf'].upper())
             self.cep = print(endereco['cep'])
             print(f'{self.numero} \n{self.complemento}\033[m'.capitalize())
-            gg = str(input('Os dados acima estão corretos? ("s" ou "n"): ')).lower()
+            gg = str(input('\nOs dados acima estão corretos? ("s" ou "n"): ')).lower()
             if gg == "s":
                 pass
             elif gg == "n":
@@ -362,7 +376,7 @@ class Pagamentos(Carrinho):
             break
 
         while bbb == True:
-            self.nome2 = str(input('\n\033[;1mNome do titular do cartão:\033[m \nNome completo: ')).upper()
+            self.nome2 = str(input('\n\033[;1mCartão de Crédito:\033[m \n\nNome completo: ')).upper()
             print('\n\033[;1mNúmero do cartão:\033[m')
             cc = Cartao()
             self.num_cartao = cc.Validar()
@@ -416,51 +430,7 @@ class Pagamentos(Carrinho):
             cursor.execute('SELECT * FROM cartao_de_credito')
             conexao.commit()
             print('\nCartão salvo !!\n')
-
-class Favoritos(Carrinho, Produtos):
-    def __init__(self) -> None:
-        super().__init__()
-    def Lista_desejos(self):
-        if self.email_test == None:
-            self.email_test = input('\nPara continuar, digite seu email: ')
-        m = True
-        while m == True:
-                cursor.execute('SELECT * FROM favoritos')
-                for linha in cursor.fetchall():
-                    if linha[1] == self.email_test:
-                        m = False
-                        break
-                if m == True:
-                    print('Você digitou o email errado, digite novamente.')
-        cursor.execute(f'SELECT * FROM favoritos WHERE email = "{self.email_test}"')
-        for linha in cursor.fetchall():
-            num_id, produto, valor = linha
-            print(f'{num_id}.{produto} R${valor}')
-        esc2 = int(input('1.Adicionar ao carrinho \n2.Remover da Lista de Desejos \n3.Voltar \n\nEscolha a opção desejada: '))
-        match esc2:
-                case 1:
-                    cursor.execute(f'INSERT INTO carrinho (id, email2, produto2, valor2) VALUES ("{num_id}", "{email_test}", "{produto}", "{valor}"')
-                    conexao.commit()
-                    print('Adicionado ao carrinho!!')
-                case 2:
-                    ttt = True
-                    num_id = int(input('\nDigite o id do produto que deseja excluir: '))
-                    cursor.execute(f'SELECT * FROM favoritos WHERE email = "{self.email_test}"')
-                    for linha in cursor.fetchall():
-                        if linha[0] == num_id:
-                            ttt = False
-                            break
-                    if ttt == True:
-                        print('\nVocê não tem este produto na sua lista de desejos!!\n')
-                        favoritos.Lista_desejos()
-                        
-                    cursor.execute('DELETE FROM favoritos WHERE id = ?, email = ?', (num_id, self.email_test))
-                    conexao.commit()
-                    print('Produto removido!!')
-                case 3:
-                    pass
-
-print("\033[1;0m\033[1;106m Olá, Bem vindo à PEDRINHO ELETRONICOS! \033[m \033[m\n\n")
+print("\033[1;0m\033[1;106m Olá, Bem vindo à PEDRINHO ELETRONICOS!\033[m\n\n")
 print("\033[;1mENTRE E APROVEITE A VARIEDADES DE PRODUTOS\033[m")
 cad = int(input('1.Cadastrar \n2.Entrar na conta \n3.Entrar como convidado \n4.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
 cadastro = Cadastro()
@@ -479,7 +449,7 @@ match cad:
         exit()
 
 while True:
-    dd = int(input('\n\033[1;0m\033[1;106m PEDRINHO ELETRÔNICOS \033[m \033[m \n1.Departamentos \n2.Carrinho de compras \n3.Lista de desejos \n4.Sair \n\nDigite a opção desejada: \n'))
+    dd = int(input('\n\033[1;0m\033[1;106m PEDRINHO ELETRÔNICOS \033[m \n1.Departamentos \n2.Carrinho de compras \n3.Sair \n\nDigite a opção desejada: \n'))
     match dd:
         case 1:
             pass
@@ -489,13 +459,14 @@ while True:
                 carr.Carrinho_compras()
 
                 def progresso(a):
-                    print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+                    print("\rCarregando: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
                 def test():
                     for n in range(101):
                         progresso(n/100)
                         time.sleep(0.01)
                 test()
                 print('\n\033[0;32m\033[1mOBRIGADO PELA COMPRA!!!\n\033[m\033[m')
+                continue
 
             elif convidado1 == False:
                 print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
@@ -508,22 +479,6 @@ while True:
                     case 2:
                         continue
         case 3:
-            if convidado1 == True:
-                favoritos = Favoritos()
-                favoritos.Lista_desejos()
-
-                continue
-            elif convidado1 == False:
-                print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
-                cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
-                match cdd:
-                    case 1:
-                        cadastro.Inserir_Dados()
-                        print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
-                        continue
-                    case 2:
-                        continue
-        case 4:
             print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
             exit()
 
@@ -544,7 +499,7 @@ while True:
                 print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
                 exit()
 
-        pg = int(input('1.Selecione produto \n2.Ir a Carrinho de compras \n3.Lista de desejos \n4.Início \n5.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
+        pg = int(input('1.Selecione produto \n2.Ir a Carrinho de compras \n3.Início \n4.Sair \n\033[;1mDIGITE A OPÇÃO DESEJADA:\033[m\n'))
         match pg:
             case 1:
                 if convidado1 == True:
@@ -566,13 +521,14 @@ while True:
                     carr.Carrinho_compras()
 
                     def progresso(a):
-                        print("\rProgress: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+                        print("\rCarregando: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
                     def test():
                         for n in range(101):
                             progresso(n/100)
                             time.sleep(0.01)
                     test()
                     print('\n\033[0;32m\033[1mOBRIGADO PELA COMPRA!!!\n\033[m\033[m')
+                    break
                 elif convidado1 == False:
                     print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
                     cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
@@ -584,21 +540,7 @@ while True:
                         case 2:
                             break
             case 3:
-                if convidado1 == True:
-                    favoritos = Favoritos()
-                    favoritos.Lista_desejos()
-                elif convidado1 == False:
-                    print('\n\033[1mPara prosseguir, crie uma conta!\033[m')
-                    cdd = int(input('1.Criar conta \n2.Voltar \n\033[1mDigite a opção desejada: \033[m'))
-                    match cdd:
-                        case 1:
-                            cadastro.Inserir_Dados()
-                            print("\nCADASTRO FEITO COM SUCESSO, APROVEITE A NOSSA LOJA.")
-                            break
-                        case 2:
-                            break
-            case 4:
                 break
-            case 5:
+            case 4:
                 print('\033[1;46m\033[1m\nOBRIGADO POR SUA VISITA, VOLTE SEMPRE!!!\033[m')
                 exit()
