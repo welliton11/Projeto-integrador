@@ -1,7 +1,7 @@
 import time
 
 def progresso(a):
-    print("\rCarregando: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
+    print("\r\033[1mCarregando: [{0:50s}] {1:.1f}%".format('#' * int(a * 50), a * 100),end='')
 
 def test():
     for n in range(101):
